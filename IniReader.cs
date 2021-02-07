@@ -11,15 +11,21 @@ namespace IniHelper
         public IniReader(string filePath)
         {
             this.FilePath = filePath;
+            this.Sections = new List<Section>();
             var lines = File.ReadAllLines(FilePath).Where(line => line.Contains("[") || line.Contains("=")).ToList();
             Section newSection = null;
             foreach (var line in lines)
             {
                 try
                 {
-                    if (line.Contains("[") && lines.Contains("]"))
+                    if (line.Contains("[") && line.Contains("]"))
                     {
                         var name = line.Split(new[] { '[', ']' })[1];
+                        if (newSection != null)
+                        {
+                            this.Sections.Add(newSection);
+                        }
+
                         newSection = new Section(name);
                     }
                     if ((line.Trim().StartsWith(";")) || !line.Contains("=")) continue;
@@ -31,7 +37,7 @@ namespace IniHelper
                 }
                 catch (Exception e)
                 {
-                    throw new Exception("ini文件读取异常,请检查字符串:"+line);
+                    throw new Exception("ini文件读取异常,请检查字符串:" + line);
                 }
             }
         }
